@@ -3,6 +3,13 @@ import sys
 import requests
 from typing import List, Dict, Any
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 BENCHMARK_TEST_QUERIES = [
     {
         "id": 1,
@@ -55,10 +62,16 @@ def run_via_api(url: str, query: str) -> Dict[str, Any]:
     }
 
 
+_GRAPH_INSTANCE = None
+
+
 def run_via_direct_graph(query: str) -> Dict[str, Any]:
     """Execute query via direct LangGraph invocation."""
-    from src.graph import build_rag_graph
-    graph = build_rag_graph()
+    global _GRAPH_INSTANCE
+    if _GRAPH_INSTANCE is None:
+        from src.graph import build_rag_graph
+        _GRAPH_INSTANCE = build_rag_graph()
+
     initial_state = {
         "question": query,
         "context": [],
@@ -66,7 +79,7 @@ def run_via_direct_graph(query: str) -> Dict[str, Any]:
         "score": 0.0,
         "sources": []
     }
-    result = graph.invoke(initial_state)
+    result = _GRAPH_INSTANCE.invoke(initial_state)
     return {
         "answer": result.get("answer", ""),
         "context": result.get("context", []),

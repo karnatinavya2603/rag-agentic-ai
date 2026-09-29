@@ -132,13 +132,7 @@ async def chat_endpoint(request: QueryRequest):
     # Initialize graph if not already cached
     if rag_graph is None:
         try:
-            settings.validate_api_keys()
             rag_graph = build_rag_graph()
-        except ValueError as err:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"API credentials not configured: {str(err)}. Update your .env file."
-            )
         except Exception as err:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -36,6 +36,15 @@ class Settings:
     data_dir: Path = BASE_DIR / "data"
     default_pdf_path: Path = BASE_DIR / "data" / "Ebook-Agentic-AI.pdf"
 
+    def has_api_keys(self) -> bool:
+        """Check if both OpenAI and Pinecone API keys are set."""
+        return bool(
+            self.openai_api_key
+            and self.pinecone_api_key
+            and self.openai_api_key.strip() not in ("", "your_openai_api_key_here")
+            and self.pinecone_api_key.strip() not in ("", "your_pinecone_api_key_here")
+        )
+
     def validate_api_keys(self) -> None:
         """Validate required API keys and raise informative errors if missing."""
         missing = []
